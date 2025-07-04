@@ -29,6 +29,8 @@ namespace App1
                 WebView2Control.Focus(Windows.UI.Xaml.FocusState.Programmatic);
                 ApplicationView view = ApplicationView.GetForCurrentView();
                 view.TryEnterFullScreenMode();
+                AdjustForSafeArea();
+                Window.Current.CoreWindow.SizeChanged += (sender, args) => AdjustForSafeArea();
             };
 
             WebView2Control.KeyDown += WebView2Control_KeyDown;
@@ -136,6 +138,17 @@ namespace App1
                 document.dispatchEvent(upEvt);
             ";
             await WebView2Control.CoreWebView2.ExecuteScriptAsync(script);
+        }
+
+        private void AdjustForSafeArea()
+        {
+            var visibleBounds = ApplicationView.GetForCurrentView().VisibleBounds;
+            var windowBounds = Window.Current.Bounds;
+            double left = visibleBounds.Left - windowBounds.Left;
+            double top = visibleBounds.Top - windowBounds.Top;
+            double right = windowBounds.Right - visibleBounds.Right;
+            double bottom = windowBounds.Bottom - visibleBounds.Bottom;
+            WebView2Control.Margin = new Thickness(left, top, right, bottom);
         }
     }
 }
