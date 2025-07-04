@@ -7,11 +7,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="Black">
+    <Grid Background="Black"
+          Margin="0"
+          Padding="0">
         <controls:WebView2
             x:Name="WebView2Control"
             Source="https://venevision.smarttv-dev.immergo.tv/"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch" />
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Width="1920"
+            Height="1080"
+        />
     </Grid>
 </Page>

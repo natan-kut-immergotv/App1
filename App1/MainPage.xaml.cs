@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Windows.Gaming.Input;
 using Windows.System;
@@ -9,7 +8,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media; // Cambiar el espacio de nombres a Windows.UI.Xaml.Media
 
 namespace App1
 {
@@ -26,7 +25,7 @@ namespace App1
 
             WebView2Control.Loaded += (s, e) =>
             {
-                WebView2Control.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+                WebView2Control.Focus(FocusState.Programmatic);
                 ApplicationView view = ApplicationView.GetForCurrentView();
                 view.TryEnterFullScreenMode();
                 AdjustForSafeArea();
@@ -37,10 +36,17 @@ namespace App1
 
             Gamepad.GamepadAdded += (sender, e) => gamepad = e;
             CompositionTarget.Rendering += UpdateGamepadState;
+
+            // Suscripción al evento Rendering de CompositionTarget
+            Windows.UI.Xaml.Media.CompositionTarget.Rendering += UpdateGamepadState;
         }
 
-        private void WebView2Control_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
+        private async void WebView2Control_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
+            // La propiedad ZoomFactor no existe en CoreWebView2. En su lugar, se puede usar ExecuteScriptAsync para ajustar el zoom.
+            string script = "document.body.style.zoom = '1.0';";
+            await WebView2Control.CoreWebView2.ExecuteScriptAsync(script);
+
             WebView2Control.CoreWebView2.OpenDevToolsWindow();
         }
 
@@ -121,7 +127,7 @@ namespace App1
 
         private async Task SendKeyToWebViewAsync(int keyCode)
         {
-            WebView2Control.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+            WebView2Control.Focus(FocusState.Programmatic);
 
             string key = KeyCodeToKey(keyCode);
             string code = KeyCodeToCode(keyCode);
