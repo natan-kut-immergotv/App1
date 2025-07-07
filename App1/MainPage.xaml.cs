@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Gaming.Input;
 using Windows.System;
@@ -8,7 +9,6 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media; // Cambiar el espacio de nombres a Windows.UI.Xaml.Media
 
 namespace App1
 {
@@ -25,28 +25,20 @@ namespace App1
 
             WebView2Control.Loaded += (s, e) =>
             {
+                ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
                 WebView2Control.Focus(FocusState.Programmatic);
-                ApplicationView view = ApplicationView.GetForCurrentView();
-                view.TryEnterFullScreenMode();
-                AdjustForSafeArea();
-                Window.Current.CoreWindow.SizeChanged += (sender, args) => AdjustForSafeArea();
             };
 
             WebView2Control.KeyDown += WebView2Control_KeyDown;
 
             Gamepad.GamepadAdded += (sender, e) => gamepad = e;
-            CompositionTarget.Rendering += UpdateGamepadState;
-
-            // Suscripción al evento Rendering de CompositionTarget
             Windows.UI.Xaml.Media.CompositionTarget.Rendering += UpdateGamepadState;
         }
 
         private async void WebView2Control_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
-            // La propiedad ZoomFactor no existe en CoreWebView2. En su lugar, se puede usar ExecuteScriptAsync para ajustar el zoom.
             string script = "document.body.style.zoom = '1.0';";
             await WebView2Control.CoreWebView2.ExecuteScriptAsync(script);
-
             WebView2Control.CoreWebView2.OpenDevToolsWindow();
         }
 
@@ -83,7 +75,7 @@ namespace App1
             lastButtons = reading.Buttons;
         }
 
-        private int GetKeyCode(VirtualKey key)
+        private static int GetKeyCode(VirtualKey key)
         {
             return key switch
             {
@@ -97,7 +89,7 @@ namespace App1
             };
         }
 
-        private string KeyCodeToKey(int keyCode)
+        private static string KeyCodeToKey(int keyCode)
         {
             return keyCode switch
             {
@@ -111,7 +103,7 @@ namespace App1
             };
         }
 
-        private string KeyCodeToCode(int keyCode)
+        private static string KeyCodeToCode(int keyCode)
         {
             return keyCode switch
             {
@@ -144,17 +136,6 @@ namespace App1
                 document.dispatchEvent(upEvt);
             ";
             await WebView2Control.CoreWebView2.ExecuteScriptAsync(script);
-        }
-
-        private void AdjustForSafeArea()
-        {
-            var visibleBounds = ApplicationView.GetForCurrentView().VisibleBounds;
-            var windowBounds = Window.Current.Bounds;
-            double left = visibleBounds.Left - windowBounds.Left;
-            double top = visibleBounds.Top - windowBounds.Top;
-            double right = windowBounds.Right - visibleBounds.Right;
-            double bottom = windowBounds.Bottom - visibleBounds.Bottom;
-            WebView2Control.Margin = new Thickness(left, top, right, bottom);
         }
     }
 }
