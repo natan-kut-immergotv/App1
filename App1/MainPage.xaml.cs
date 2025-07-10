@@ -35,12 +35,40 @@ namespace App1
             Windows.UI.Xaml.Media.CompositionTarget.Rendering += UpdateGamepadState;
         }
 
-        private async void WebView2Control_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
+        private void WebView2Control_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
-            string script = "document.body.style.zoom = '1.0';";
-            await WebView2Control.CoreWebView2.ExecuteScriptAsync(script);
-            WebView2Control.CoreWebView2.OpenDevToolsWindow();
+            WebView2Control.NavigationCompleted += WebView2Control_NavigationCompleted;
         }
+
+        private async void WebView2Control_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
+        {
+            string script = @"
+        const targetWidth = 1920;
+        const actualWidth = window.innerWidth;
+        const actualHeight = window.innerHeight;
+
+        const scale = actualWidth / targetWidth;
+
+        document.body.style.transform = `scale(${scale})`;
+        document.body.style.transformOrigin = 'top left';
+        document.body.style.width = `${targetWidth}px`;
+        document.body.style.height = `${actualHeight / scale}px`;
+        document.body.style.overflow = 'auto';
+
+        console.log('✅ Escalado y altura ajustada. scale:', scale, 'adjusted height:', actualHeight / scale);
+    ";
+
+            try
+            {
+                await WebView2Control.CoreWebView2.ExecuteScriptAsync(script);
+                Debug.WriteLine("✅ Script ejecutado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("❌ Error al inyectar script: " + ex.Message);
+            }
+        }
+
 
         private async void WebView2Control_KeyDown(object sender, KeyRoutedEventArgs e)
         {
