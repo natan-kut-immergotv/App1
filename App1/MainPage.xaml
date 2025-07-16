@@ -10,7 +10,7 @@
     <Grid Background="Black">
         <controls:WebView2
             x:Name="WebView2Control"
-            Source="https://venevision.smarttv-dev.immergo.tv/"
+            Source="https://channel14.smarttv-dev.immergo.tv/"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch" />
     </Grid>

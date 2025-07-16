@@ -42,6 +42,16 @@ namespace App1
         private void WebView2Control_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
             WebView2Control.CoreWebView2.OpenDevToolsWindow();
+            
+            // Configurar zoom fijo para evitar escalado automático
+            WebView2Control.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
+            WebView2Control.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
+            
+            // Establecer zoom al 100%
+            WebView2Control.CoreWebView2.DocumentTitleChanged += async (s, e) =>
+            {
+                await WebView2Control.CoreWebView2.ExecuteScriptAsync("document.body.style.zoom = '1.0';");
+            };
         }
 
         private async void WebView2Control_KeyDown(object sender, KeyRoutedEventArgs e)
